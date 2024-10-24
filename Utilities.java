@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Utilities {
-
     
 
     public static String calcAnimalBirthDate(int age, String theSeason) {

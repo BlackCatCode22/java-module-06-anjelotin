@@ -20,7 +20,7 @@ public class App {
 
         // Create the animal name lists.
         // Call Utilities to get the animal name lists
-        String filePath = "C:\\Users\\BE218\\ZooMidterm\\textFiles\\animalNames.txt";  // Update with the correct file path
+        String filePath = "C:\\Users\\BE218\\ZooMidterm\\zooMidterm\\animalNames.txt";  // Update with the correct file path
         AnimalNameListsWrapper animalLists = Utilities.createAnimalNameLists(filePath);
 
         // Access the hyena names list
@@ -54,9 +54,20 @@ public class App {
 
         BufferedReader reader = null;
 
+        String aniSex;
+        String aniSpecies;
+        String aniColor;
+        String aniWeight;
+        String origin1;
+        String origin2;
+        String aniAge;
+
+
+
+
         try {
             // Create a BufferedReader to read the file
-            reader = new BufferedReader(new FileReader("C:\\Users\\BE218\\ZooMidterm\\textFiles\\arrivingAnimals.txt"));
+            reader = new BufferedReader(new FileReader("C:\\Users\\BE218\\ZooMidterm\\zooMidterm\\arrivingAnimals.txt"));
             String line;
 
             // Read each line of the file until reaching the end
@@ -79,6 +90,26 @@ public class App {
                     System.out.println("Element " + elementNum + " of arrayOfStrPartsOnSpace is: " + thePart);
                     elementNum++;
                 }
+
+                // Get animal's sex and species and age
+                aniAge = arrayOfStrPartsOnSpace[0];
+                // make this an int.
+                int intAniAge = Integer.parseInt(aniAge);
+                aniSex = arrayOfStrPartsOnSpace[3];
+                aniSpecies = arrayOfStrPartsOnSpace[4];
+                aniWeight = arrayOfStrPartsOnComma[3];
+                aniColor = arrayOfStrPartsOnComma[2];
+                origin1 = arrayOfStrPartsOnComma[4];
+                origin2 = arrayOfStrPartsOnComma[5];
+
+
+                System.out.println("\n the animal sex is: " + aniSex);
+                System.out.println("\n The species is: " + aniSpecies);
+                System.out.println("\n The animal weigh is: " + aniWeight);
+                System.out.println("\n The animal color is: " + aniColor);
+                System.out.println("\n The animal is from: " + origin1);
+                System.out.println("\n The animal is from: " + origin2);
+
                 System.out.println();
 
                 String[] arrayOfStrPartsOnSpace02 = arrayOfStrPartsOnComma[1].split(" ");
@@ -93,6 +124,20 @@ public class App {
                 String animalBirthSeason = arrayOfStrPartsOnSpace02[2];
                 System.out.println("The age in years of the animal is: " + ageInYears);
                 System.out.println("The season of birth of the animal is: " + animalBirthSeason);
+
+                // Create the right animal object for this arriving animal.
+
+                if (aniSpecies.equals("hyena")) {
+                    System.out.println("\n the animal is a hyena!");
+                    // Create a hyena object and attach to the hyena arrayList;
+                    Hyena myNewHyena = new Hyena(aniSex, intAniAge, 99, "to be named", "to be named",
+                            "to be given birthdate", aniColor, origin1 + origin2);
+
+                    System.out.println("the new hyena's color is " + myNewHyena.getAnimalColor());
+                }
+
+
+
 
                 // this is a unit test - we are testing the Animal constructor we just created
                 Animal myNewAnimal = new Animal("male", 4, 70, "Zig", "Hy01", "2020-3-21", "brown spots", "from San Diego Zoo");

@@ -9,5 +9,11 @@ public class Hyena extends angelo.zoo.com.Animal {
         super();
         numOfHyenas++;
     }
+    public Hyena(String sex, int age, int weight, String animalID, String animalName,
+                 String animalBirthdate, String animalColor, String animalOrigin) {
+        super(sex,age, weight, animalID, animalName, animalBirthdate, animalColor, animalOrigin);
+        numOfHyenas++;
+    }
 
 }
+
