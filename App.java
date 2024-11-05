@@ -1,169 +1,166 @@
-// Angelo Andrade
-// 10/22/24
-// App.java
-
-
 package angelo.zoo.com;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
+import static angelo.zoo.com.Utilities.getUniqueName;
 
 public class App {
-
     public static void main(String[] args) {
-
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.println("Welcome to my Zoo Program!");
-
-        // Create the animal name lists.
-        // Call Utilities to get the animal name lists
-        String filePath = "C:\\Users\\BE218\\ZooMidterm\\zooMidterm\\animalNames.txt";  // Update with the correct file path
+        // Load the animal names from the file
+        String filePath = "animalNames.txt";
         AnimalNameListsWrapper animalLists = Utilities.createAnimalNameLists(filePath);
+        Random random = new Random();
 
-        // Access the hyena names list
-        ArrayList<String> listOfHyenaNames = animalLists.getHyenaNameList();
+        // Initialize used names lists for each species
+        List<String> usedHyenaNames = new ArrayList<>();
+        List<String> usedLionNames = new ArrayList<>();
+        List<String> usedTigerNames = new ArrayList<>();
+        List<String> usedBearNames = new ArrayList<>();
 
-        // Use a for-each loop to output each hyena name
-        System.out.println("Hyena Names:");
-        for (String hyenaName : listOfHyenaNames) {
-            System.out.println(hyenaName);
-        }
+        // This will hold the details of all animals for the report
+        StringBuilder reportContent = new StringBuilder();
 
-        // Similarly, you can do this for the other animal lists
-        ArrayList<String> listOfLionNames = animalLists.getLionNameList();
-        System.out.println("\nLion Names:");
-        for (String lionName : listOfLionNames) {
-            System.out.println(lionName);
-        }
-
-        ArrayList<String> listOfTigerNames = animalLists.getTigerNameList();
-        System.out.println("\nTiger Names:");
-        for (String tigerName : listOfTigerNames) {
-            System.out.println(tigerName);
-        }
-
-        ArrayList<String> listOfBearNames = animalLists.getBearNameList();
-        System.out.println("\nBear Names:");
-        for (String bearName : listOfBearNames) {
-            System.out.println(bearName);
-        }
-
-
-        BufferedReader reader = null;
-
-        String aniSex;
-        String aniSpecies;
-        String aniColor;
-        String aniWeight;
-        String origin1;
-        String origin2;
-        String aniAge;
-
-
-
-
-        try {
-            // Create a BufferedReader to read the file
-            reader = new BufferedReader(new FileReader("C:\\Users\\BE218\\ZooMidterm\\zooMidterm\\arrivingAnimals.txt"));
+        try (BufferedReader reader = new BufferedReader(new FileReader("arrivingAnimals.txt"))) {
             String line;
 
-            // Read each line of the file until reaching the end
             while ((line = reader.readLine()) != null) {
-                // Print each line to the console
                 System.out.println(line);
-                // Parse this line of text.
                 String[] arrayOfStrPartsOnComma = line.split(", ");
-                // output the array elements
-                // this is a for : each loop - very handy when examining array elements.
-                int elementNum = 0;
-                for (String thePart : arrayOfStrPartsOnComma) {
-                    System.out.println("Element " + elementNum + " of arrayOfStrPartsOnComma is: " + thePart);
-                    elementNum++;
-                }
-                System.out.println();
-                String[] arrayOfStrPartsOnSpace = arrayOfStrPartsOnComma[0].split(" ");
-                elementNum = 0;
-                for (String thePart : arrayOfStrPartsOnSpace) {
-                    System.out.println("Element " + elementNum + " of arrayOfStrPartsOnSpace is: " + thePart);
-                    elementNum++;
-                }
 
-                // Get animal's sex and species and age
-                aniAge = arrayOfStrPartsOnSpace[0];
-                // make this an int.
+                // Extracting animal attributes
+                String aniAge = arrayOfStrPartsOnComma[0].split(" ")[0];
                 int intAniAge = Integer.parseInt(aniAge);
-                aniSex = arrayOfStrPartsOnSpace[3];
-                aniSpecies = arrayOfStrPartsOnSpace[4];
-                aniWeight = arrayOfStrPartsOnComma[3];
-                aniColor = arrayOfStrPartsOnComma[2];
-                origin1 = arrayOfStrPartsOnComma[4];
-                origin2 = arrayOfStrPartsOnComma[5];
+                String aniSex = arrayOfStrPartsOnComma[0].split(" ")[3];
+                String aniSpecies = arrayOfStrPartsOnComma[0].split(" ")[4];
 
+                // Get weight, color, and origins
+                int intAniWeight = Integer.parseInt(arrayOfStrPartsOnComma[3].replaceAll("[^\\d]", ""));
+                String aniColor = arrayOfStrPartsOnComma[2];
+                String origin1 = arrayOfStrPartsOnComma[4];
+                String origin2 = arrayOfStrPartsOnComma[5];
 
-                System.out.println("\n the animal sex is: " + aniSex);
-                System.out.println("\n The species is: " + aniSpecies);
-                System.out.println("\n The animal weigh is: " + aniWeight);
-                System.out.println("\n The animal color is: " + aniColor);
-                System.out.println("\n The animal is from: " + origin1);
-                System.out.println("\n The animal is from: " + origin2);
+                // Get a unique animal ID
+                String animalID = Utilities.generateAnimalID(aniSpecies);
 
-                System.out.println();
+                // Calculate the animal birthdate
+                String animalBirthSeason = arrayOfStrPartsOnComma[1].split(" ")[2];
+                String animalBirthdate = Utilities.calcAnimalBirthDate(intAniAge, animalBirthSeason);
 
-                String[] arrayOfStrPartsOnSpace02 = arrayOfStrPartsOnComma[1].split(" ");
-                elementNum = 0;
-                for (String thePart : arrayOfStrPartsOnSpace02) {
-                    System.out.println("Element " + elementNum + " of arrayOfStrPartsOnSpace02 is: " + thePart);
-                    elementNum++;
+                // Create the animal object with a unique name
+                Animal myNewAnimal = createAnimal(aniSpecies, aniSex, intAniAge, intAniWeight, animalID, animalLists, animalBirthdate, aniColor, origin1 + " " + origin2, usedHyenaNames, usedLionNames, usedTigerNames, usedBearNames);
+
+                if (myNewAnimal != null) {
+                    // Get the current date for arrival
+                    String arrivalDate = LocalDate.now().toString();
+
+                    // Print details of the new animal
+                    String animalDetails = myNewAnimal.getAnimalID() + "; " + myNewAnimal.getAnimalName() + "; " + animalBirthdate + "; " + intAniAge + " years old; " + aniColor + " " + aniSex + "; " + intAniWeight + " pounds" + "; " + myNewAnimal.makeSound() + "; arrive date: " + arrivalDate;
+                    System.out.println(animalDetails);
+
+                    // Append animal details to the report content
+                    reportContent.append(animalDetails).append("\n");
                 }
-                System.out.println();
+            }
 
-                String ageInYears = arrayOfStrPartsOnSpace[0];
-                String animalBirthSeason = arrayOfStrPartsOnSpace02[2];
-                System.out.println("The age in years of the animal is: " + ageInYears);
-                System.out.println("The season of birth of the animal is: " + animalBirthSeason);
+            // Write the report to a file
+            writeZooPopulationReport(reportContent.toString());
 
-                // Create the right animal object for this arriving animal.
+        } catch (IOException e) {
+            System.out.println("An error occurred while reading the animal data file: " + e.getMessage());
+        }
+    }
 
-                if (aniSpecies.equals("hyena")) {
-                    System.out.println("\n the animal is a hyena!");
-                    // Create a hyena object and attach to the hyena arrayList;
-                    Hyena myNewHyena = new Hyena(aniSex, intAniAge, 99, "to be named", "to be named",
-                            "to be given birthdate", aniColor, origin1 + origin2);
+    private static Animal createAnimal(String species, String sex, int age, int weight, String id, AnimalNameListsWrapper animalLists, String animalBirthdate, String color, String origin, List<String> usedHyenaNames, List<String> usedLionNames, List<String> usedTigerNames, List<String> usedBearNames) {
+        Random random = new Random();
+        String animalName = null;
 
-                    System.out.println("the new hyena's color is " + myNewHyena.getAnimalColor());
-                }
+        switch (species.toLowerCase()) {
+            case "hyena":
+                animalName = getUniqueName(animalLists.getHyenaNameList(), usedHyenaNames, random);
+                return new Hyena(sex, age, weight, id, animalName, animalBirthdate, color, origin);
+            case "lion":
+                animalName = getUniqueName(animalLists.getLionNameList(), usedLionNames, random);
+                return new Lion(sex, age, weight, id, animalName, animalBirthdate, color, origin);
+            case "tiger":
+                animalName = getUniqueName(animalLists.getTigerNameList(), usedTigerNames, random);
+                return new Tiger(sex, age, weight, id, animalName, animalBirthdate, color, origin);
+            case "bear":
+                animalName = getUniqueName(animalLists.getBearNameList(), usedBearNames, random);
+                return new Bear(sex, age, weight, id, animalName, animalBirthdate, color, origin);
+            default:
+                System.out.println("\nUnknown species: " + species);
+                return null;
+        }
+    }
 
 
+    private static void writeZooPopulationReport(String reportContent) {
+        String fileName = "zooPopulation.txt";
+        File file = new File(fileName);
 
-
-                // this is a unit test - we are testing the Animal constructor we just created
-                Animal myNewAnimal = new Animal("male", 4, 70, "Zig", "Hy01", "2020-3-21", "brown spots", "from San Diego Zoo");
-
-                // Prove it!
-                System.out.println("\n this is the new animal!\n");
-                System.out.println("\n ID is: " + myNewAnimal.getAnimalID() + " and... name is: " + myNewAnimal.getAnimalName() + "\n");
-
-                // add Utilities to prefix calcAnimalBirthDate()
-                System.out.println("animal birthdate is: " + Utilities.calcAnimalBirthDate(Integer.parseInt(ageInYears), animalBirthSeason));
-
-
+        // Create the file if it doesn't exist
+        try {
+            if (file.createNewFile()) {
+                System.out.println("File created: " + file.getName());
+            } else {
+                System.out.println("File already exists. Appending data...");
             }
         } catch (IOException e) {
-            // Handle exceptions, such as file not found or I/O errors
-            e.printStackTrace();
-        } finally {
-            // Close the BufferedReader in the finally block to ensure it gets closed
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            System.out.println("An error occurred while creating the file: " + e.getMessage());
         }
 
+        // Write the report content to the file
+        try (PrintWriter writer = new PrintWriter(new FileWriter(file, true))) { // Append mode
+            writer.println("******* Zoo Population Report ********");
+
+            // Split the report content into lines for processing
+            String[] lines = reportContent.split("\n");
+            String lastSpecies = "";
+
+            for (String line : lines) {
+                // Determine the species from the line
+                String[] parts = line.split("; ");
+                String speciesCode = parts[0].substring(0, 2); // Extract species code (e.g., "Hy" for Hyena)
+
+                // Add a header if the species changes
+                switch (speciesCode) {
+                    case "Hy":
+                        if (!lastSpecies.equals("Hy")) {
+                            writer.println("\nHyena Habitat:");
+                            lastSpecies = "Hy";
+                        }
+                        break;
+                    case "Li":
+                        if (!lastSpecies.equals("Li")) {
+                            writer.println("\nLion Habitat:");
+                            lastSpecies = "Li";
+                        }
+                        break;
+                    case "Ti":
+                        if (!lastSpecies.equals("Ti")) {
+                            writer.println("\nTiger Habitat:");
+                            lastSpecies = "Ti";
+                        }
+                        break;
+                    case "Be":
+                        if (!lastSpecies.equals("Be")) {
+                            writer.println("\nBear Habitat:");
+                            lastSpecies = "Be";
+                        }
+                        break;
+                    default:
+                        break; // Unknown species
+                }
+
+                // Write the animal details to the file
+                writer.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred while writing the zoo population report: " + e.getMessage());
+        }
     }
 }
